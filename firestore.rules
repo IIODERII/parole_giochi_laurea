@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function loggato() {
+      return request.auth != null;
+    }
+
+    // Solo l'account di Oder puo' modificare ed eliminare.
+    function admin() {
+      return loggato() && request.auth.token.email == 'oder@laurea.local';
+    }
+
+    function parolaValida(d) {
+      return d.parola is string
+        && d.parola.size() >= 3
+        && d.parola.size() <= 15
+        && d.definizione is string
+        && d.definizione.size() > 0
+        && d.definizione.size() <= 300
+        && d.autore is string
+        && d.autore.size() <= 40;
+    }
+
+    match /parole/{id} {
+      allow read: if loggato();
+      allow create: if loggato() && parolaValida(request.resource.data);
+      allow update: if admin() && parolaValida(request.resource.data);
+      allow delete: if admin();
+    }
+
+    // Tutto il resto e' chiuso.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,106 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Bordeaux: il colore del fiocco di laurea di Sara */
+  --color-bordeaux-50: #fdf4f6;
+  --color-bordeaux-100: #fae7ec;
+  --color-bordeaux-200: #f3cbd6;
+  --color-bordeaux-300: #e5a1b4;
+  --color-bordeaux-400: #d16e8b;
+  --color-bordeaux-500: #b84465;
+  --color-bordeaux-600: #9c2f4e;
+  --color-bordeaux-700: #7b1e3a;
+  --color-bordeaux-800: #5f162c;
+  --color-bordeaux-900: #430f1f;
+
+  /* Oro: dettagli, bordi, accenti */
+  --color-oro-100: #fbf4dc;
+  --color-oro-200: #f4e4ae;
+  --color-oro-300: #e9cf78;
+  --color-oro-400: #d9b84c;
+  --color-oro-500: #c9a227;
+  --color-oro-600: #a4821b;
+
+  /* Fondo pergamena */
+  --color-crema-50: #fdfbf7;
+  --color-crema-100: #faf6ed;
+  --color-crema-200: #f1e9d9;
+  --color-crema-300: #e3d7bf;
+
+  --color-inchiostro: #2b2320;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-crema-100);
+    color: var(--color-inchiostro);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  /* Evita lo zoom automatico di iOS sui campi di input */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-oro-200 bg-white shadow-sm;
+  }
+
+  .field-label {
+    @apply mb-1 block text-sm font-semibold text-bordeaux-800;
+  }
+
+  .field {
+    @apply w-full rounded-lg border border-crema-300 bg-crema-50 px-3 py-2.5 text-base
+           text-inchiostro outline-none transition
+           placeholder:text-inchiostro/35
+           focus:border-bordeaux-400 focus:bg-white focus:ring-2 focus:ring-bordeaux-200;
+  }
+
+  /* base comune dei bottoni: in Tailwind 4 @apply non puo' richiamare
+     un'altra classe personalizzata, quindi la si elenca nel selettore */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2.5
+           text-sm font-semibold transition select-none
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-bordeaux-700 text-crema-50 hover:bg-bordeaux-800 active:bg-bordeaux-900;
+  }
+
+  .btn-secondary {
+    @apply border border-bordeaux-300 bg-white text-bordeaux-700 hover:bg-bordeaux-50;
+  }
+
+  .btn-ghost {
+    @apply text-bordeaux-700 hover:bg-bordeaux-50;
+  }
+
+  .btn-danger {
+    @apply border border-red-300 bg-white text-red-700 hover:bg-red-50;
+  }
+}
