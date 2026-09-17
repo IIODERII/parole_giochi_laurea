@@ -1,4 +1,3 @@
-import { FESTEGGIATA } from '../../config'
 import type { Cruciverba } from './generator'
 
 export type FormatoFoglio = 'a4' | 'a3'
@@ -74,7 +73,7 @@ export function calcolaPoster(
     dimensione: grande ? 48 : 34,
   }
   const sottotitolo = {
-    testo: `Il cruciverba per la laurea di ${FESTEGGIATA}`,
+    testo: ``,
     y: titolo.y + (grande ? 10 : 8),
     dimensione: grande ? 15 : 12,
   }
