@@ -1,3 +1,4 @@
+import { mescola, mulberry32 } from '../shared/random'
 import { LUNGHEZZA_MAX, LUNGHEZZA_MIN, normalizzaParola } from './normalize'
 import type { Parola } from './types'
 
@@ -37,18 +38,6 @@ export interface Cruciverba {
   orizzontali: Piazzamento[]
   verticali: Piazzamento[]
   scartate: Scartata[]
-}
-
-// Generatore casuale deterministico: con lo stesso seme la griglia prodotta
-// e' sempre identica, cosi' non cambia a ogni ricaricamento della pagina.
-function mulberry32(seme: number): () => number {
-  let a = seme >>> 0
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0
-    let t = Math.imul(a ^ (a >>> 15), 1 | a)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
 }
 
 interface Posizione {
@@ -280,15 +269,6 @@ function meglio(a: Tentativo, b: Tentativo): boolean {
   if (qa.piazzate !== qb.piazzate) return qa.piazzate > qb.piazzate
   if (qa.area !== qb.area) return qa.area < qb.area
   return qa.lato < qb.lato
-}
-
-function mescola(voci: Voce[], random: () => number): void {
-  for (let i = voci.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1))
-    const tmp = voci[i]
-    voci[i] = voci[j]
-    voci[j] = tmp
-  }
 }
 
 function ordina(voci: Voce[], tentativo: number, random: () => number): Voce[] {

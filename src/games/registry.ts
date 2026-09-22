@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react'
+import BingoPage from './bingo/BingoPage'
 import CruciverbaPage from './cruciverba/CruciverbaPage'
 
 /**
@@ -27,6 +28,16 @@ export const giochi: Gioco[] = [
       'Proponi una parola e la sua definizione: verranno incastrate tutte insieme in un cruciverba da stampare.',
     emoji: '✏️',
     Componente: CruciverbaPage,
+    attivo: true,
+  },
+  {
+    id: 'bingo',
+    titolo: 'BingoSara',
+    percorso: '/bingo',
+    descrizione:
+      'Scrivi cosa pensi che succederà durante la festa: diventerà una casella delle cartelle del bingo.',
+    emoji: '🎲',
+    Componente: BingoPage,
     attivo: true,
   },
 ]

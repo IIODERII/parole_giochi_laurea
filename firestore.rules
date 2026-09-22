@@ -12,6 +12,7 @@ service cloud.firestore {
       return loggato() && request.auth.token.email == 'oder@laurea.local';
     }
 
+    // --- CruciSara: parole e definizioni ---------------------------------
     function parolaValida(d) {
       return d.parola is string
         && d.parola.size() >= 3
@@ -27,6 +28,22 @@ service cloud.firestore {
       allow read: if loggato();
       allow create: if loggato() && parolaValida(request.resource.data);
       allow update: if admin() && parolaValida(request.resource.data);
+      allow delete: if admin();
+    }
+
+    // --- BingoSara: previsioni sulla serata ------------------------------
+    function fraseValida(d) {
+      return d.testo is string
+        && d.testo.size() >= 3
+        && d.testo.size() <= 80
+        && d.autore is string
+        && d.autore.size() <= 40;
+    }
+
+    match /frasi/{id} {
+      allow read: if loggato();
+      allow create: if loggato() && fraseValida(request.resource.data);
+      allow update: if admin() && fraseValida(request.resource.data);
       allow delete: if admin();
     }
 

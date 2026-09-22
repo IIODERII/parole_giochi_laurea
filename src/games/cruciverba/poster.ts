@@ -1,3 +1,4 @@
+import { MM_PER_PUNTO } from '../shared/stampa'
 import type { Cruciverba } from './generator'
 
 export type FormatoFoglio = 'a4' | 'a3'
@@ -8,8 +9,7 @@ const FOGLI: Record<FormatoFoglio, { larghezza: number; altezza: number }> = {
   a3: { larghezza: 297, altezza: 420 },
 }
 
-/** Un punto tipografico in millimetri. */
-export const MM_PER_PUNTO = 0.3528
+export { MM_PER_PUNTO }
 
 export const TITOLO_POSTER = 'CruciSara'
 

@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { leggiAutore, salvaAutore } from '../shared/autore'
 import {
   AUTORE_MAX,
   DEFINIZIONE_MAX,
@@ -9,8 +10,6 @@ import {
 } from './normalize'
 import type { DatiParola, Parola } from './types'
 import { messaggioErroreFirestore } from './useParole'
-
-const CHIAVE_AUTORE = 'crucisara:autore'
 
 interface Props {
   parole: Parola[]
@@ -25,15 +24,7 @@ export default function WordForm({ parole, aggiungi }: Props) {
   const [conferma, setConferma] = useState<string | null>(null)
   const [inCorso, setInCorso] = useState(false)
 
-  // il nome di chi scrive viene ricordato, cosi' non va riscritto ogni volta
-  useEffect(() => {
-    try {
-      const salvato = localStorage.getItem(CHIAVE_AUTORE)
-      if (salvato) setAutore(salvato)
-    } catch {
-      /* localStorage non disponibile: pazienza */
-    }
-  }, [])
+  useEffect(() => setAutore(leggiAutore()), [])
 
   const anteprima = normalizzaParola(parola)
 
@@ -58,11 +49,7 @@ export default function WordForm({ parole, aggiungi }: Props) {
     setInCorso(true)
     try {
       await aggiungi({ parola: p.valore, definizione: d.valore, autore: a.valore })
-      try {
-        localStorage.setItem(CHIAVE_AUTORE, a.valore)
-      } catch {
-        /* niente */
-      }
+      salvaAutore(a.valore)
       setParola('')
       setDefinizione('')
       setConferma(`"${p.valore}" aggiunta al cruciverba. Grazie!`)
