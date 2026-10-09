@@ -20,6 +20,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       user,
       username: emailToUsername(user?.email),
       isAdmin: (user?.email ?? '').toLowerCase() === ADMIN_EMAIL,
+      isAnonimo: user?.isAnonymous ?? false,
       loading,
       login: async (username: string, password: string) => {
         await signInWithEmailAndPassword(auth, usernameToEmail(username), password)

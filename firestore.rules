@@ -3,13 +3,22 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function loggato() {
+    // Chi e' entrato con utente e password (gli anonimi del QR non passano).
+    function registrato() {
+      return request.auth != null && request.auth.token.email != null;
+    }
+
+    // Chiunque abbia una identita', anche quella anonima del gioco.
+    function connesso() {
       return request.auth != null;
     }
 
-    // Solo l'account di Oder puo' modificare ed eliminare.
     function admin() {
-      return loggato() && request.auth.token.email == 'oder@laurea.local';
+      return registrato() && request.auth.token.email == 'oder@laurea.local';
+    }
+
+    function statoPartita() {
+      return get(/databases/$(database)/documents/partita/corrente).data.stato;
     }
 
     // --- CruciSara: parole e definizioni ---------------------------------
@@ -25,8 +34,8 @@ service cloud.firestore {
     }
 
     match /parole/{id} {
-      allow read: if loggato();
-      allow create: if loggato() && parolaValida(request.resource.data);
+      allow read: if registrato();
+      allow create: if registrato() && parolaValida(request.resource.data);
       allow update: if admin() && parolaValida(request.resource.data);
       allow delete: if admin();
     }
@@ -41,10 +50,47 @@ service cloud.firestore {
     }
 
     match /frasi/{id} {
-      allow read: if loggato();
-      allow create: if loggato() && fraseValida(request.resource.data);
+      allow read: if registrato();
+      allow create: if registrato() && fraseValida(request.resource.data);
       allow update: if admin() && fraseValida(request.resource.data);
       allow delete: if admin();
+    }
+
+    // --- Cash or Sara ----------------------------------------------------
+    // Gli oggetti contengono le valutazioni vere: nessuno all'infuori di Oder
+    // puo' nemmeno leggerli. Agli invitati arriva solo quello che Oder mette
+    // nel documento della partita.
+    match /oggetti/{id} {
+      allow read, write: if admin();
+    }
+
+    match /partita/{partitaId} {
+      allow read: if connesso();
+      allow write: if admin();
+
+      match /giocatori/{giocatoreId} {
+        allow read: if connesso();
+        allow create, update: if admin()
+          || (connesso()
+              && request.auth.uid == giocatoreId
+              && request.resource.data.nome is string
+              && request.resource.data.nome.size() >= 2
+              && request.resource.data.nome.size() <= 24);
+        allow delete: if admin();
+      }
+
+      match /risposte/{rispostaId} {
+        allow read: if connesso();
+        // si punta solo su se stessi e solo mentre le puntate sono aperte
+        allow create, update: if admin()
+          || (connesso()
+              && request.resource.data.giocatoreId == request.auth.uid
+              && request.resource.data.valore is number
+              && request.resource.data.valore >= 0
+              && request.resource.data.valore <= 1000000
+              && statoPartita() == 'puntate');
+        allow delete: if admin();
+      }
     }
 
     // Tutto il resto e' chiuso.

@@ -6,13 +6,17 @@ Sito per raccogliere in anticipo il materiale dei giochi della festa di laurea.
   da solo il cruciverba, che Oder scarica in PDF o PNG e fa stampare.
 - **BingoSara** — gli invitati scrivono cosa pensano succedera' durante la serata,
   e da quelle previsioni Oder genera le cartelle del bingo da stampare e ritagliare.
+- **Cash or Sara** - il gioco della serata: si proietta un oggetto per volta e
+  tutti indovinano quanto vale dal telefono. Gli invitati entrano inquadrando un
+  QR, senza password.
 
 ## Come funziona
 
 - **React + Vite + TypeScript + Tailwind**, tutto lato browser.
 - **Firebase Firestore** come archivio condiviso (collezioni `parole` e `frasi`).
 - **Firebase Authentication** per l'accesso: due utenti, `oder` (amministratore)
-  e `ospiti` (tutti gli altri).
+  e `ospiti` (tutti gli altri), piu' l'**accesso anonimo** per chi entra dal QR
+  di Cash or Sara.
 - Nessun server da gestire: il sito e' statico e sta su GitHub Pages.
 
 ## Comandi
@@ -28,7 +32,9 @@ npm run deploy   # compila e pubblica su GitHub Pages
 
 1. Le chiavi del progetto stanno in `.env` (non finisce su git). Il modello e'
    in `.env.example`.
-2. In **Authentication -> Sign-in method** va attivato **Email/Password**.
+2. In **Authentication -> Sign-in method** vanno attivati **Email/Password** e
+   **Anonimo** (serve a Cash or Sara: gli invitati entrano dal QR senza digitare
+   nulla).
 3. In **Authentication -> Users** vanno creati i due utenti `oder@laurea.local`
    e `ospiti@laurea.local`. Il dominio e' fittizio: serve solo perche' Firebase
    vuole un'email. Nel form di login si scrive solo `oder` oppure `ospiti`.
@@ -48,6 +54,8 @@ npm run deploy   # compila e pubblica su GitHub Pages
 | Modificare / eliminare | no | si |
 | Vedere le parole rimaste fuori | no | si |
 | Generare e scaricare cartelle e cartelloni | no | si |
+| Vedere e comandare Cash or Sara | no | si |
+| Giocare a Cash or Sara dal QR | si, anche senza account | si |
 
 ## Struttura
 
@@ -60,6 +68,7 @@ src/
     shared/              hook Firestore, numeri casuali, nome del giocatore
     cruciverba/          form, elenco, algoritmo, anteprima, PDF e PNG
     bingo/               form, elenco, generatore di cartelle, PDF
+    cashorsara/          regia, proiezione, pagina del giocatore, punteggi
   pages/       home
   config.ts    nomi, titoli, utenti
 ```
@@ -104,6 +113,32 @@ forbici, e ogni cartella si stringe sul proprio contenuto invece di lasciare
 spazio vuoto. La dimensione del testo e' unica per tutte le caselle di tutte le
 cartelle: si sceglie la piu' grande con cui anche la frase piu' lunga ci sta
 dentro.
+
+## Come funziona Cash or Sara
+
+Tre viste sullo stesso momento di gioco, tenute in sincrono da un documento
+di Firestore (`partita/corrente`):
+
+- `/cashorsara` - la **regia**: prepara gli oggetti (nome, storia, foto,
+  valutazione vera) e comanda la partita. Solo Oder.
+- `/proiezione` - lo **schermo**: in attesa mostra il QR e chi e' entrato,
+  durante il gioco l'oggetto con quanti hanno gia' puntato, poi la rivelazione
+  e la classifica. Ha una piccola barra comandi, perche' con il portatile che
+  duplica la TV aprire la regia mostrerebbe a tutti la valutazione vera.
+- `/gioca` - il **telefono** dell'invitato: nome, cifra, esito.
+
+La valutazione vera vive solo nella collezione `oggetti`, leggibile dal solo
+Oder. Entra nel documento della partita soltanto quando lui la rivela, e da quel
+momento diventa pubblica: e' per questo che nessuno puo' sbirciare il risultato
+nemmeno andando a curiosare nel database.
+
+I punteggi non vengono mai salvati: si ricalcolano dalle puntate e dai valori
+gia' rivelati (100 punti meno la percentuale di errore, piu' 20 a chi si
+avvicina di piu'). Cosi' chi entra a meta' partita o corregge una puntata non
+manda niente fuori sincrono.
+
+Le foto vengono ridotte nel browser prima di essere salvate, perche' Firebase
+Storage non e' disponibile sul piano gratuito.
 
 ## Pubblicazione
 

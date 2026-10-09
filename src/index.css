@@ -3,6 +3,8 @@
 @theme {
   --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Il fumetto di Alessandro Rosa nella proiezione di Cash or Sara */
+  --font-fumetto: 'Comic Neue', 'Comic Sans MS', 'Segoe Print', cursive;
 
   /* Bordeaux: il colore del fiocco di laurea di Sara */
   --color-bordeaux-50: #fdf4f6;

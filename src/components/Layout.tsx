@@ -1,11 +1,12 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../auth/authContext'
 import { CORSO_DI_LAUREA, FESTEGGIATA, TITOLO_SITO } from '../config'
-import { giochiAttivi } from '../games/registry'
+import { giochiVisibili } from '../games/registry'
 import Tocco from './Tocco'
 
 export default function Layout() {
   const { username, isAdmin, logout } = useAuth()
+  const giochi = giochiVisibili(isAdmin)
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -34,9 +35,9 @@ export default function Layout() {
             </div>
           </div>
 
-          {giochiAttivi.length > 1 && (
+          {giochi.length > 1 && (
             <nav className="mt-3 flex flex-wrap gap-2">
-              {giochiAttivi.map((gioco) => (
+              {giochi.map((gioco) => (
                 <NavLink
                   key={gioco.id}
                   to={gioco.percorso}

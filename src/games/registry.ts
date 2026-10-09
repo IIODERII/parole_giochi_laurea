@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import BingoPage from './bingo/BingoPage'
+import RegiaPage from './cashorsara/RegiaPage'
 import CruciverbaPage from './cruciverba/CruciverbaPage'
 
 /**
@@ -17,6 +18,8 @@ export interface Gioco {
   emoji: string
   Componente: ComponentType
   attivo: boolean
+  /** Visibile solo a Oder: gli invitati non lo vedono nel menu. */
+  soloAdmin?: boolean
 }
 
 export const giochi: Gioco[] = [
@@ -40,6 +43,21 @@ export const giochi: Gioco[] = [
     Componente: BingoPage,
     attivo: true,
   },
+  {
+    id: 'cashorsara',
+    titolo: 'Cash or Sara',
+    percorso: '/cashorsara',
+    descrizione:
+      'Il gioco della serata: si indovina quanto vale ogni oggetto. Gli invitati entrano dal QR proiettato.',
+    emoji: '💎',
+    Componente: RegiaPage,
+    attivo: true,
+    soloAdmin: true,
+  },
 ]
 
 export const giochiAttivi = giochi.filter((g) => g.attivo)
+
+export function giochiVisibili(isAdmin: boolean): Gioco[] {
+  return giochiAttivi.filter((g) => isAdmin || !g.soloAdmin)
+}

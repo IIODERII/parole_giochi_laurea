@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../auth/authContext'
 import Tocco from '../components/Tocco'
 import { CORSO_DI_LAUREA, DATA_LAUREA, FESTEGGIATA, NOME_BREVE } from '../config'
-import { giochiAttivi } from '../games/registry'
+import { giochiVisibili } from '../games/registry'
 
 export default function HomePage() {
+  const { isAdmin } = useAuth()
+  const giochi = giochiVisibili(isAdmin)
+
   return (
     <div className="space-y-8">
       <section className="card relative overflow-hidden px-6 py-10 text-center">
@@ -24,7 +28,7 @@ export default function HomePage() {
       <section>
         <h2 className="mb-3 text-xl font-semibold text-bordeaux-800">I giochi</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          {giochiAttivi.map((gioco) => (
+          {giochi.map((gioco) => (
             <Link
               key={gioco.id}
               to={gioco.percorso}

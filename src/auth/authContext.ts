@@ -6,6 +6,8 @@ export interface AuthState {
   /** Nome utente senza dominio, es. "oder" oppure "ospiti". */
   username: string
   isAdmin: boolean
+  /** Ospite entrato dal QR del gioco, senza utente e password. */
+  isAnonimo: boolean
   loading: boolean
   login: (username: string, password: string) => Promise<void>
   logout: () => Promise<void>

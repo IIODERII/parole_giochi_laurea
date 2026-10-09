@@ -3,7 +3,7 @@ import Loader from '../components/Loader'
 import { useAuth } from './authContext'
 
 export default function ProtectedRoute() {
-  const { user, loading } = useAuth()
+  const { user, loading, isAnonimo } = useAuth()
   const location = useLocation()
 
   if (loading) {
@@ -12,6 +12,12 @@ export default function ProtectedRoute() {
         <Loader testo="Un attimo…" />
       </div>
     )
+  }
+
+  // gli ospiti entrati dal QR restano nel loro gioco: il resto del sito
+  // richiede utente e password
+  if (user && isAnonimo) {
+    return <Navigate to="/gioca" replace />
   }
 
   if (!user) {
