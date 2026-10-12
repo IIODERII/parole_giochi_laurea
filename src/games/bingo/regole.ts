@@ -15,10 +15,13 @@ export interface DisegnatorePdf {
   getTextWidth(testo: string): number
 }
 
+/** Nome con cui il font del titolo viene registrato in jsPDF. */
+export const FONT_TITOLO_PDF = 'DMSerifDisplay'
+
 const TITOLO = 'BingoSara'
 const SOTTOTITOLO = 'come si gioca'
 const INTRO =
-  'Ogni casella è una previsione su quello che succederà stasera. Quando una si avvera, segna il pallino.'
+  'Ogni casella è una previsione su quello che succederà stasera. Quando una si avvera, fai una crocetta nel quadratino.'
 
 const CONTROLLO: [string, string] = [
   'Prima di iniziare, controlla la cartella.',
@@ -78,7 +81,7 @@ interface Scritta {
   dimensione: number
   stile: Stile
   colore: [number, number, number]
-  carattere: 'helvetica' | 'times'
+  carattere: 'helvetica' | 'times' | typeof FONT_TITOLO_PDF
 }
 
 export interface Regole {
@@ -153,11 +156,11 @@ export function componiRegole(
     dx: pad,
     dy: y,
     dimensione: dimTitolo,
-    stile: 'bold',
+    stile: 'normal',
     colore: BORDEAUX,
-    carattere: 'times',
+    carattere: FONT_TITOLO_PDF,
   })
-  doc.setFont('times', 'bold')
+  doc.setFont(FONT_TITOLO_PDF, 'normal')
   doc.setFontSize(dimTitolo)
   scritte.push({
     testo: SOTTOTITOLO,

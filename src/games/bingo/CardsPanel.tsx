@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
+import AnteprimaCartelle from './AnteprimaCartelle'
 import {
   scaricaCartelle,
   stimaStampa,
-  TITOLO_BINGO,
   type CartellePerFoglio,
   type LatoRilegatura,
 } from './exportCartelle'
@@ -12,7 +12,6 @@ import type { Frase } from './types'
 const COLONNE = [3, 4, 5, 6]
 const RIGHE = [2, 3, 4, 5]
 const PER_FOGLIO: CartellePerFoglio[] = [1, 2, 3, 4, 6, 8]
-const ANTEPRIMA_MAX = 4
 
 function Scelta<T extends string | number>({
   valore,
@@ -163,7 +162,7 @@ export default function CardsPanel({ frasi }: Props) {
           {stima &&
             ` · cartella ${stima.larghezzaCartella.toFixed(0)}×${stima.altezzaCartella.toFixed(
               0,
-            )} mm, casella ${stima.cella.toFixed(1)} mm · ${
+            )} mm, casella ${stima.cellaL.toFixed(0)}×${stima.cellaA.toFixed(0)} mm · ${
               regole ? stima.fogli * 2 : stima.fogli
             } facciate da stampare`}
         </p>
@@ -194,38 +193,12 @@ export default function CardsPanel({ frasi }: Props) {
             {errorePdf && <span className="text-xs text-red-700">{errorePdf}</span>}
           </div>
 
-          <p className="mb-2 text-xs font-semibold text-inchiostro/50">
-            Anteprima delle prime {Math.min(ANTEPRIMA_MAX, esito.cartelle.length)} cartelle
-          </p>
-          <div className={`grid gap-4 ${colonne >= 5 ? '' : 'sm:grid-cols-2'}`}>
-            {esito.cartelle.slice(0, ANTEPRIMA_MAX).map((cartella) => (
-              <div key={cartella.numero} className="rounded-lg border border-oro-300 bg-white p-3">
-                <div className="mb-1.5 flex items-baseline justify-between">
-                  <span className="font-display text-base font-semibold text-bordeaux-700">
-                    {TITOLO_BINGO}
-                  </span>
-                  <span className="text-[10px] text-inchiostro/45">n. {cartella.numero}</span>
-                </div>
-                <div
-                  className="grid gap-px bg-crema-300"
-                  style={{ gridTemplateColumns: `repeat(${colonne}, minmax(0, 1fr))` }}
-                >
-                  {cartella.caselle.map((testo, i) => (
-                    <div
-                      key={i}
-                      className="flex aspect-square flex-col items-center justify-center gap-1 bg-white p-1 text-center text-[9px] leading-tight text-inchiostro/85"
-                    >
-                      <span>{testo}</span>
-                      <span className="h-2 w-2 shrink-0 rounded-full border border-inchiostro/35" />
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-1.5 border-t border-crema-200 pt-1 text-[10px] italic text-inchiostro/40">
-                  Nome: ______________
-                </p>
-              </div>
-            ))}
-          </div>
+          <AnteprimaCartelle
+            cartelle={esito.cartelle}
+            forma={forma}
+            perFoglio={perFoglio}
+            quante={quante}
+          />
         </>
       )}
     </section>
