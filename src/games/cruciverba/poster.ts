@@ -30,6 +30,7 @@ export interface CellaPoster {
 export interface ColonnaPoster {
   titolo: string
   x: number
+  larghezza: number
   blocchi: string[][]
 }
 
@@ -49,6 +50,39 @@ export interface Poster {
   colonne: ColonnaPoster[]
   dimensioneTesto: number
   interlinea: number
+}
+
+export interface RigaPoster {
+  testo: string
+  x: number
+  y: number
+  titolo: boolean
+  /** 0 per il primo foglio; nel PDF le definizioni troppo lunghe proseguono dopo. */
+  pagina: number
+}
+
+/** Dove va ogni riga delle definizioni, titoli delle colonne compresi. */
+export function righeDefinizioni(poster: Poster): RigaPoster[] {
+  const righe: RigaPoster[] = []
+  for (const colonna of poster.colonne) {
+    let y = poster.yColonne
+    let pagina = 0
+    righe.push({ testo: colonna.titolo, x: colonna.x, y, titolo: true, pagina })
+    y += poster.interlinea * 2
+
+    for (const blocco of colonna.blocchi) {
+      for (const testo of blocco) {
+        if (y > poster.altezza - poster.margine) {
+          pagina++
+          y = poster.margine
+        }
+        righe.push({ testo, x: colonna.x, y, titolo: false, pagina })
+        y += poster.interlinea
+      }
+      y += poster.interlinea * 0.3
+    }
+  }
+  return righe
 }
 
 /** Sotto questa dimensione le definizioni diventano faticose da leggere. */
@@ -159,8 +193,18 @@ export function calcolaPoster(
     dimensioneNumero: Math.max(4, Math.min(11, (composizione.lato * 0.26) / MM_PER_PUNTO)),
     yColonne: composizione.yColonne,
     colonne: [
-      { titolo: 'ORIZZONTALI', x: margine, blocchi: composizione.orizzontali },
-      { titolo: 'VERTICALI', x: margine + larghezzaColonna + spazio, blocchi: composizione.verticali },
+      {
+        titolo: 'ORIZZONTALI',
+        x: margine,
+        larghezza: larghezzaColonna,
+        blocchi: composizione.orizzontali,
+      },
+      {
+        titolo: 'VERTICALI',
+        x: margine + larghezzaColonna + spazio,
+        larghezza: larghezzaColonna,
+        blocchi: composizione.verticali,
+      },
     ],
     dimensioneTesto: composizione.dimensioneTesto,
     interlinea: composizione.dimensioneTesto * MM_PER_PUNTO * 1.25,

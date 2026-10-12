@@ -37,6 +37,10 @@ const VOCI: [string, string][] = [
 
 const PARAGRAFI: [string, string][] = [
   [
+    'Tieni le orecchie aperte.',
+    'Quando Oder vede avverarsi una previsione la annuncia ad alta voce: controlla se ce l’hai.',
+  ],
+  [
     'Dichiarala ad alta voce.',
     'Una combinazione vale solo se la annunci: vince chi la dice per primo.',
   ],
@@ -47,6 +51,10 @@ const PARAGRAFI: [string, string][] = [
   [
     'In caso di pareggio, sasso carta forbice.',
     'Se due gridano insieme si decide sul momento, una mano secca.',
+  ],
+  [
+    'Nessun bingo a fine serata?',
+    'Vince chi ha segnato più caselle. A pari caselle, sasso carta forbice.',
   ],
 ]
 

@@ -103,7 +103,7 @@ export default function WordList({ parole, caricamento, isAdmin, modifica, elimi
             : 'Nessuna parola corrisponde alla ricerca.'}
         </p>
       ) : (
-        <ul className="divide-y divide-crema-200">
+        <ul className="-mr-2 max-h-[60vh] divide-y divide-crema-200 overflow-y-auto overscroll-contain pr-2 sm:max-h-[32rem]">
           {visibili.map((p) => (
             <li key={p.id} className="py-3">
               {inModifica === p.id ? (

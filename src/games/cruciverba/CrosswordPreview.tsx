@@ -23,6 +23,9 @@ export default function CrosswordPreview({ cruciverba, isAdmin, onRigenera }: Pr
   const [visibile, setVisibile] = useState(false)
   const [soluzioni, setSoluzioni] = useState(true)
   const [formato, setFormato] = useState<FormatoFoglio>('a4')
+  const [foto, setFoto] = useState(true)
+  // cambiando il seme le foto si dispongono in un altro modo
+  const [semeFoto, setSemeFoto] = useState(1)
   const [esportazione, setEsportazione] = useState<'pdf' | 'png' | null>(null)
   const [errore, setErrore] = useState<string | null>(null)
 
@@ -30,8 +33,9 @@ export default function CrosswordPreview({ cruciverba, isAdmin, onRigenera }: Pr
     setErrore(null)
     setEsportazione(tipo)
     try {
-      if (tipo === 'pdf') await scaricaPdf(cruciverba, formato)
-      else await scaricaImmagine(cruciverba, formato)
+      const seme = foto ? semeFoto : null
+      if (tipo === 'pdf') await scaricaPdf(cruciverba, formato, seme)
+      else await scaricaImmagine(cruciverba, formato, seme)
     } catch {
       setErrore('Non sono riuscito a creare il file. Riprova.')
     } finally {
@@ -101,6 +105,25 @@ export default function CrosswordPreview({ cruciverba, isAdmin, onRigenera }: Pr
               </button>
             ))}
           </div>
+
+          <label className="ml-1 flex items-center gap-1.5 text-xs text-inchiostro/75">
+            <input
+              type="checkbox"
+              className="h-4 w-4 accent-[#7b1e3a]"
+              checked={foto}
+              onChange={(e) => setFoto(e.target.checked)}
+            />
+            Foto di Sara
+          </label>
+          {foto && (
+            <button
+              className="btn-ghost px-2 py-2 text-xs"
+              title="Le foto cambiano posto, misura e inclinazione"
+              onClick={() => setSemeFoto((s) => s + 1)}
+            >
+              Rimescola foto{semeFoto > 1 ? ` (${semeFoto})` : ''}
+            </button>
+          )}
 
           <button
             className="btn-primary px-3 py-2 text-xs"

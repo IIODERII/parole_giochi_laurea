@@ -1,11 +1,17 @@
+import { adesivoComePng, caricaAdesivi, disponiAdesivi } from './adesivi'
 import type { Cruciverba } from './generator'
-import { calcolaPoster, type FormatoFoglio, type Misuratore } from './poster'
+import { calcolaPoster, righeDefinizioni, type FormatoFoglio, type Misuratore } from './poster'
 
 /**
  * Genera e scarica il cartellone: una pagina con la griglia vuota e, sotto,
  * le definizioni su due colonne. La soluzione non viene stampata.
+ * Con un seme, negli spazi liberi si attaccano le foto di Sara.
  */
-export async function costruisciPdf(cruciverba: Cruciverba, formato: FormatoFoglio = 'a4') {
+export async function costruisciPdf(
+  cruciverba: Cruciverba,
+  formato: FormatoFoglio = 'a4',
+  semeFoto: number | null = null,
+) {
   const { jsPDF } = await import('jspdf')
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: formato })
 
@@ -52,35 +58,49 @@ export async function costruisciPdf(cruciverba: Cruciverba, formato: FormatoFogl
     }
   }
 
-  // --- definizioni -------------------------------------------------------
-  for (const colonna of poster.colonne) {
-    let y = poster.yColonne
-    doc.setFont('times', 'bold')
-    doc.setFontSize(poster.dimensioneTesto + 1)
-    doc.setTextColor(123, 30, 58)
-    doc.text(colonna.titolo, colonna.x, y)
-    y += poster.interlinea * 2
-
-    doc.setFont('times', 'normal')
-    doc.setFontSize(poster.dimensioneTesto)
-    doc.setTextColor(40, 35, 32)
-    for (const blocco of colonna.blocchi) {
-      for (const riga of blocco) {
-        if (y > poster.altezza - poster.margine) {
-          doc.addPage()
-          y = poster.margine
-        }
-        doc.text(riga, colonna.x, y)
-        y += poster.interlinea
-      }
-      y += poster.interlinea * 0.3
+  // --- foto di Sara ------------------------------------------------------
+  // prima del testo: dopo addPage si sarebbe gia' sul secondo foglio
+  if (semeFoto !== null) {
+    const adesivi = disponiAdesivi(poster, formato, await caricaAdesivi(), semeFoto)
+    for (const adesivo of adesivi) {
+      doc.addImage(
+        adesivoComePng(adesivo),
+        'PNG',
+        adesivo.x,
+        adesivo.y,
+        adesivo.ingombroL,
+        adesivo.ingombroA,
+        undefined,
+        'FAST',
+      )
     }
+  }
+
+  // --- definizioni -------------------------------------------------------
+  // ogni colonna che sfora prosegue sul foglio dopo, alla stessa altezza
+  for (const riga of righeDefinizioni(poster)) {
+    while (doc.getNumberOfPages() < riga.pagina + 1) doc.addPage()
+    doc.setPage(riga.pagina + 1)
+    if (riga.titolo) {
+      doc.setFont('times', 'bold')
+      doc.setFontSize(poster.dimensioneTesto + 1)
+      doc.setTextColor(123, 30, 58)
+    } else {
+      doc.setFont('times', 'normal')
+      doc.setFontSize(poster.dimensioneTesto)
+      doc.setTextColor(40, 35, 32)
+    }
+    doc.text(riga.testo, riga.x, riga.y)
   }
 
   return doc
 }
 
-export async function scaricaPdf(cruciverba: Cruciverba, formato: FormatoFoglio = 'a4') {
-  const doc = await costruisciPdf(cruciverba, formato)
+export async function scaricaPdf(
+  cruciverba: Cruciverba,
+  formato: FormatoFoglio = 'a4',
+  semeFoto: number | null = null,
+) {
+  const doc = await costruisciPdf(cruciverba, formato, semeFoto)
   doc.save(`crucisara-${formato}.pdf`)
 }

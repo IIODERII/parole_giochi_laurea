@@ -1,5 +1,6 @@
 import { useAuth } from '../../auth/authContext'
 import CardsPanel from './CardsPanel'
+import GestioneFrasi from './GestioneFrasi'
 import PhraseForm from './PhraseForm'
 import PhraseList from './PhraseList'
 import { useFrasi } from './useFrasi'
@@ -36,6 +37,7 @@ export default function BingoPage() {
         />
       </div>
 
+      {isAdmin && <GestioneFrasi frasi={frasi} aggiungi={aggiungi} />}
       {isAdmin && <CardsPanel frasi={frasi} />}
     </div>
   )

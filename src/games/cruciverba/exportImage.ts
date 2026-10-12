@@ -1,5 +1,12 @@
+import { caricaAdesivi, disegnaAdesivo, disponiAdesivi } from './adesivi'
 import type { Cruciverba } from './generator'
-import { calcolaPoster, MM_PER_PUNTO, type FormatoFoglio, type Misuratore } from './poster'
+import {
+  calcolaPoster,
+  MM_PER_PUNTO,
+  righeDefinizioni,
+  type FormatoFoglio,
+  type Misuratore,
+} from './poster'
 
 /**
  * Punti per pollice dell'immagine prodotta. 300 e' qualita' di stampa;
@@ -61,8 +68,13 @@ function scaricaTela(tela: HTMLCanvasElement, nome: string): Promise<void> {
 /**
  * Stesso cartellone del PDF, ma come immagine PNG ad alta risoluzione:
  * il disegno e' vettoriale fino all'ultimo momento, quindi non si sgrana.
+ * Con un seme, negli spazi liberi si attaccano le foto di Sara.
  */
-export async function scaricaImmagine(cruciverba: Cruciverba, formato: FormatoFoglio = 'a4') {
+export async function scaricaImmagine(
+  cruciverba: Cruciverba,
+  formato: FormatoFoglio = 'a4',
+  semeFoto: number | null = null,
+) {
   // senza questa attesa il canvas potrebbe disegnare con un carattere di
   // ripiego, diverso da quello che si vede nel sito
   try {
@@ -122,21 +134,20 @@ export async function scaricaImmagine(cruciverba: Cruciverba, formato: FormatoFo
   }
 
   // --- definizioni -------------------------------------------------------
-  for (const colonna of poster.colonne) {
-    let y = poster.yColonne
-    ctx.fillStyle = '#7b1e3a'
-    ctx.font = font(poster.dimensioneTesto + 1, '700', SERIF)
-    ctx.fillText(colonna.titolo, colonna.x, y)
-    y += poster.interlinea * 2
+  // l'immagine e' un foglio solo: quello che sfora resta fuori
+  for (const riga of righeDefinizioni(poster)) {
+    if (riga.pagina > 0) continue
+    ctx.fillStyle = riga.titolo ? '#7b1e3a' : '#282320'
+    ctx.font = riga.titolo
+      ? font(poster.dimensioneTesto + 1, '700', SERIF)
+      : font(poster.dimensioneTesto, '400', SERIF)
+    ctx.fillText(riga.testo, riga.x, riga.y)
+  }
 
-    ctx.fillStyle = '#282320'
-    ctx.font = font(poster.dimensioneTesto, '400', SERIF)
-    for (const blocco of colonna.blocchi) {
-      for (const riga of blocco) {
-        ctx.fillText(riga, colonna.x, y)
-        y += poster.interlinea
-      }
-      y += poster.interlinea * 0.3
+  // --- foto di Sara ------------------------------------------------------
+  if (semeFoto !== null) {
+    for (const adesivo of disponiAdesivi(poster, formato, await caricaAdesivi(), semeFoto)) {
+      disegnaAdesivo(ctx, adesivo)
     }
   }
 

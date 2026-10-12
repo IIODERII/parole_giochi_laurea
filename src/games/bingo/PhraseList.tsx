@@ -93,7 +93,7 @@ export default function PhraseList({ frasi, caricamento, isAdmin, modifica, elim
             : 'Nessuna previsione corrisponde alla ricerca.'}
         </p>
       ) : (
-        <ul className="divide-y divide-crema-200">
+        <ul className="-mr-2 max-h-[60vh] divide-y divide-crema-200 overflow-y-auto overscroll-contain pr-2 sm:max-h-[32rem]">
           {visibili.map((f) => (
             <li key={f.id} className="py-3">
               {inModifica === f.id ? (
